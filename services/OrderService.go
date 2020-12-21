@@ -6,7 +6,7 @@ type OrderService struct {
 	Version string
 }
 
-func NewOrderService() *OrderService{
+func  NewOrderService() *OrderService{
 	return &OrderService{Version: "1.0"}
 }
 

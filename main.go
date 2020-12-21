@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/songdony/go_ioc/Injector"
+	. "github.com/songdony/go_ioc/Injector"
 	"github.com/songdony/go_ioc/services"
 )
 
@@ -15,8 +15,11 @@ func main(){
 	//// 用户订单
 	//userService.GetOrderInfo(uid)
 
-	//Injector.BeanFactory.Set(services.NewOrderService())
-	Injector.BeanFactory.Set(&services.OrderService{})
-	order := Injector.BeanFactory.Get((*services.OrderService)(nil))
-	fmt.Println(order)
+	BeanFactory.Set(services.NewOrderService())
+	//Injector.BeanFactory.Set(&services.OrderService{})
+	//order := Injector.BeanFactory.Get((*services.OrderService)(nil))
+
+	userService := services.NewUserService()
+	BeanFactory.Apply(userService)
+	fmt.Println(userService.Order)
 }
