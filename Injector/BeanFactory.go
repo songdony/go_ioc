@@ -1,6 +1,11 @@
 package Injector
 
-import "reflect"
+import (
+	"log"
+	"reflect"
+
+	"github.com/shenyisyn/goft-expr/src/expr"
+)
 
 var BeanFactory *BeanFactoryImpl
 
@@ -10,6 +15,7 @@ func init(){
 
 type BeanFactoryImpl struct{
 	beanMapper BeanMapper
+	ExprMap map[string]interface{}
 }
 
 func(this *BeanFactoryImpl) Set(vlist ...interface{}){
@@ -48,15 +54,26 @@ func(this *BeanFactoryImpl) Apply(bean interface{}){
 		field := v.Type().Field(i)
 
 		if v.Field(i).CanSet() && field.Tag.Get("inject") != "" {
-			if get_v := this.Get(field.Type);get_v != nil {
-				v.Field(i).Set(reflect.ValueOf(get_v))
+			if field.Tag.Get("inject") == "-"{
+				// 兼容老的方式注入
+				if get_v := this.Get(field.Type);get_v != nil {
+					v.Field(i).Set(reflect.ValueOf(get_v))
+				}
+			}else{
+				// 表达式方式支持
+				log.Println("使用表达式方式")
+				ret := expr.BeanExpr(field.Tag.Get("inject"),this.ExprMap)
+				if ret != nil && !ret.IsEmpty(){
+					v.Field(i).Set(reflect.ValueOf(ret[0]))
+				}
 			}
+
 		}
 	}
 }
 
 func NewBeanFactory() *BeanFactoryImpl {
-	return &BeanFactoryImpl{beanMapper: make(BeanMapper)}
+	return &BeanFactoryImpl{beanMapper: make(BeanMapper),ExprMap: make(map[string]interface{})}
 }
 
 
