@@ -3,23 +3,26 @@ package main
 import (
 	"fmt"
 
+	"github.com/songdony/go_ioc/Config"
 	. "github.com/songdony/go_ioc/Injector"
 	"github.com/songdony/go_ioc/services"
 )
 
 func main(){
-	//uid := 1
-	//userService := services.NewUserService(services.NewOrderService())
-	//// 用户详细
-	//userService.GetUserInfo(uid)
-	//// 用户订单
-	//userService.GetOrderInfo(uid)
-
-	BeanFactory.Set(services.NewOrderService())
-	//Injector.BeanFactory.Set(&services.OrderService{})
-	//order := Injector.BeanFactory.Get((*services.OrderService)(nil))
-
-	userService := services.NewUserService()
-	BeanFactory.Apply(userService)
-	fmt.Println(userService.Order)
+	serviceConfig := Config.NewServiceConfig()
+	BeanFactory.ExprMap = map[string]interface{}{
+		"ServiceConfig" :serviceConfig,
+	}
+	{
+		// 这里测试 userService
+		userService := services.NewUserService()
+		BeanFactory.Apply(userService)
+		fmt.Println(userService.Order)
+	}
+	{
+		// 这里测试 adminService
+		adminService := services.NewAdminService()
+		BeanFactory.Apply(adminService)
+		fmt.Println(adminService.Order)
+	}
 }

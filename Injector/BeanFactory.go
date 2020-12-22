@@ -1,7 +1,6 @@
 package Injector
 
 import (
-	"log"
 	"reflect"
 
 	"github.com/shenyisyn/goft-expr/src/expr"
@@ -54,17 +53,21 @@ func(this *BeanFactoryImpl) Apply(bean interface{}){
 		field := v.Type().Field(i)
 
 		if v.Field(i).CanSet() && field.Tag.Get("inject") != "" {
-			if field.Tag.Get("inject") == "-"{
-				// 兼容老的方式注入
-				if get_v := this.Get(field.Type);get_v != nil {
-					v.Field(i).Set(reflect.ValueOf(get_v))
-				}
-			}else{
+			if get_v := this.Get(field.Type);get_v != nil {
+				v.Field(i).Set(reflect.ValueOf(get_v))
+				continue
+			}
+
+			if field.Tag.Get("inject") != "-"{
 				// 表达式方式支持
-				log.Println("使用表达式方式")
 				ret := expr.BeanExpr(field.Tag.Get("inject"),this.ExprMap)
 				if ret != nil && !ret.IsEmpty(){
-					v.Field(i).Set(reflect.ValueOf(ret[0]))
+					retValue := ret[0]
+					if retValue != nil{
+						this.Set(retValue)
+						v.Field(i).Set(reflect.ValueOf(retValue))
+					}
+
 				}
 			}
 
