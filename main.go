@@ -10,9 +10,8 @@ import (
 
 func main(){
 	serviceConfig := Config.NewServiceConfig()
-	BeanFactory.ExprMap = map[string]interface{}{
-		"ServiceConfig" :serviceConfig,
-	}
+	BeanFactory.Config(serviceConfig)
+
 	{
 		// 这里测试 userService
 		userService := services.NewUserService()

@@ -1,7 +1,7 @@
 package services
 
 type  AdminService struct {
-	Order *OrderService `inject:"ServiceConfig.OrderService()"`
+	Order *OrderService `inject:"-"`
 }
 
 func NewAdminService() *AdminService{
